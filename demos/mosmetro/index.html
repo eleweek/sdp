@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title> Подобрать билет </title>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.3.0/milligram.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.1/rangeslider.css">
+    <link rel="stylesheet" href="all.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.1/rangeslider.js"></script>
+    <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.js"></script>
+    <script>
+        var ticketDescriptions = [{
+            type: 'unlim',
+            name: 'На сутки',
+            days: 1,
+            price: 210
+          }, {
+            type: 'unlim',
+            name: 'На 3 дня',
+            days: 3,
+            price: 400
+          }, {
+            type: 'unlim',
+            name: 'На неделю',
+            days: 7,
+            price: 800
+          }, {
+            type: 'unlim',
+            name: 'На месяц',
+            days: 30,
+            price: 2000
+          }, {
+            type: 'unlim',
+            name: 'На три месяца',
+            days: 90,
+            price: 5000
+          }, {
+            type: 'unlim',
+            name: 'На год',
+            days: 365,
+            price: 18200
+          }, {
+            type: 'lim',
+            name: '1 поездка',
+            trips: 1,
+            days: 5,
+            price: 55,
+          }, {
+            type: 'lim',
+            name: '2 поездки',
+            trips: 2,
+            days: 5,
+            price: 110,
+          }, {
+            type: 'lim',
+            name: '20 поездок',
+            trips: 20,
+            days: 90,
+            price: 720,
+          }, {
+            type: 'lim',
+            name: '40 поездок',
+            trips: 40,
+            days: 90,
+            price: 1440,
+          }, {
+            type: 'lim',
+            name: '60 поездок',
+            trips: 60,
+            days: 90,
+            price: 1700,
+          }, {
+            type: 'lim',
+            name: '1 поездка (по тройке)',
+            trips: 1,
+            days: 365 * 5,
+            price: 35,
+          }
+        ]
+
+        var calcTripCost = function(ticketDescription, tripsPerWeek) {
+          var tripsPerDay = tripsPerWeek / 7;
+          var tripsPerPeriod = Math.round(tripsPerDay * ticketDescription.days);
+
+          if (ticketDescription.type == "unlim") {
+            var avgTripCost = ticketDescription.price / tripsPerPeriod;
+            var wastedTrips = null;
+          } else  if (ticketDescription.type == "lim") {
+
+            if (ticketDescription.days < 7 && ticketDescription.trips <= tripsPerWeek) {
+              var tripsUsed = ticketDescription.trips; 
+            } else {
+              var tripsUsed = Math.min(ticketDescription.trips, tripsPerPeriod);
+            }
+
+            var avgTripCost = ticketDescription.price / tripsUsed;
+            var wastedTrips = ticketDescription.trips - tripsUsed;
+          }
+
+          return {
+            'avgTripCost': avgTripCost,
+            'wastedTrips': wastedTrips
+          }
+        }
+
+        var ticketWarning = function(ticketDescription, wastedTrips) {
+          if (!wastedTrips) {
+            return '';
+          }
+          msg = 'Сгорит ' + wastedTrips.toFixed(0) + ' ';
+          if (wastedTrips == 1) {
+            msg += 'поездка';
+          } else if (wastedTrips in [2, 3, 4]) {
+            msg += 'поездки';
+          } else {
+            msg += 'поездок';
+          }
+
+          return msg;
+        }
+
+        var padHidden0 = function(num, targetLen) {
+          var padded = num.toString();
+          var remaining = targetLen - padded.length;
+          if (remaining > 0) {
+            padded = '<span class="hidden">' + Array(remaining + 1).join('0') + '</span>' + padded;
+          }
+
+          return padded;
+        }
+
+
+        $(document).ready(function() {
+          $('input[type="range"]').rangeslider({
+            polyfill: true
+          });
+
+          var defaultSliderValue = +$('#tripsRange').val();
+
+          $('#results > tbody').empty();
+          for (var [idx, ticketDescription] of ticketDescriptions.entries()) {
+            var {avgTripCost, wastedTrips} = calcTripCost(ticketDescription, defaultSliderValue);
+            $('#results > tbody').append(`<tr id="results-ticket-id-${idx}"> <td class="name"> ${ticketDescription.name} </td> <td class="price"> ${padHidden0(ticketDescription.price, 5)}₽ </td> <td class="avgTripCost"> ${avgTripCost.toFixed(2)}₽ </td> <td class="wastedTrips"> ${ticketWarning(ticketDescription, wastedTrips)} </td> </tr>`);
+          }
+
+          var $table = $('#results > tbody').isotope({
+            layoutMode: 'vertical',
+            transitionDuration: '0.7s',
+            getSortData: {
+              avgTripCost: function(itemElem) {
+                  var avgTripCost = $(itemElem).find('.avgTripCost').text();
+                  return parseFloat(avgTripCost.replace('₽', ''));
+              }
+            }
+          });
+
+          $table.isotope({sortBy: 'avgTripCost'});
+
+          var refreshResultsTable = function(tripsCount) {
+            for (var [idx, ticketDescription] of ticketDescriptions.entries()) {
+              var {avgTripCost, wastedTrips} = calcTripCost(ticketDescription, tripsCount);
+              row = $("#results-ticket-id-" + idx);
+              console.log(row);
+              console.log(row.html());
+              row.find('td.avgTripCost').html(avgTripCost.toFixed(2) + '₽');
+              row.find('td.wastedTrips').html(ticketWarning(ticketDescription, wastedTrips));
+            }
+            $table.isotope('updateSortData').isotope();
+          }
+
+
+          $('#tripsRange').on('input', function() {
+            var tripsCount = +$(this).val();
+            $('#tripsCount').val(tripsCount);
+            refreshResultsTable(tripsCount);
+          });
+
+          $('#tripsCount').on('input', function() {
+            var tripsCount = +$(this).val();
+            if (tripsCount > 0) {
+              $('#tripsRange').val(tripsCount);
+              refreshResultsTable(tripsCount);
+            }
+          });
+        });
+    </script>
+    <style>
+      #results, #results > thead, #results > tbody {
+        display: block;
+      }
+
+      #results tr {
+        display: inline-block;
+      }
+
+      #results td {
+        padding-top: 0.7rem;
+        padding-bottom: 0.7rem;
+      }
+
+      #results .name {
+        width: 250px;
+      }
+
+      #results .price {
+        width: 100px;
+      }
+
+      #results .avgTripCost {
+        width: 100px;
+      }
+
+      #results .wastedTrips {
+        width: 200px;
+      }
+
+      .hidden {
+        visibility: hidden;
+      }
+
+      h1, h2 {
+        color: #000;
+      }
+
+      .metro-logo {
+        width: 103px;
+        height: 72px;
+        margin-right: 40px;
+      }
+
+      .logo-header {
+        margin-bottom: 35px;
+      }
+
+      .container {
+        padding: 10px 10px 10px 10px;
+      }
+
+      .slider {
+          -webkit-appearance: none;
+          width: 350px;
+          height: 35px;
+          border-radius: 22.5px;   
+          background: #d3d3d3;
+          outline: none;
+          opacity: 0.7;
+          -webkit-transition: .2s;
+          transition: opacity .2s;
+      }
+
+      .slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 45px;
+          height: 45px;
+          border-radius: 50%; 
+          background: crimson;
+          cursor: pointer;
+      }
+
+      .slider::-moz-range-thumb {
+          width: 45px;
+          height: 45px;
+          border-radius: 50%;
+          background: crimson;
+          cursor: pointer;
+      }
+
+      #slideactive {
+          background-color: crimson;
+          height: 100%;
+      }
+
+      #tripsCount {
+          font-size: 3rem;
+          width: 100px;
+          color: #000;
+          height:35px;
+      }
+
+      td {
+          border-bottom-style: none;
+      }
+
+      td, th {
+          font-weight: normal;
+          color: #000;
+      }
+
+      .hidden {
+          visibility: hidden;
+      }
+    </style>
+	</head>
+	<body>
+    <div class="container">
+      <h1 class="logo-header"> <img src="metro-logo.gif" class="metro-logo">
+        Подобрать билет
+      </h1>
+      <h1>
+        Поездок в неделю
+      </h1>
+
+      <div class="row">
+        <div class="column column-10">
+          <input type="text" value="20" id="tripsCount">
+        </div>
+        <div class="column column-90">
+          <input type="range" min="1" max="40" value="20" class="slider" id="tripsRange">
+        </div>
+      </div>
+      <div class="row">
+        <div class="column">
+          <table id="results">
+            <thead>
+              <tr>
+                <th class="name"> Билет </th>
+                <th class="price"> Цена билета </th>
+                <th class="avgTripCost"> Цена поездки </th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+	</body>
+</html>
