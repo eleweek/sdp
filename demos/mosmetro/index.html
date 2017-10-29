@@ -83,7 +83,7 @@
 
         var calcTripCost = function(ticketDescription, tripsPerWeek) {
           var tripsPerDay = tripsPerWeek / 7;
-          var tripsPerPeriod = Math.round(tripsPerDay * ticketDescription.days);
+          var tripsPerPeriod = Math.max(Math.round(tripsPerDay * ticketDescription.days), 1);
 
           if (ticketDescription.type == "unlim") {
             var avgTripCost = ticketDescription.price / tripsPerPeriod;
