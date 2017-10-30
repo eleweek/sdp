@@ -111,9 +111,12 @@
             return '';
           }
           msg = 'Сгорит ' + wastedTrips.toFixed(0) + ' ';
-          if (wastedTrips == 1) {
+          var mod = wastedTrips % 10;
+          if (wastedTrips > 4 && wastedTrips < 21) {
+            msg += 'поездок';
+          } else if (mod == 1) {
             msg += 'поездка';
-          } else if (wastedTrips in [2, 3, 4]) {
+          } else if (mod in [2, 3, 4]) {
             msg += 'поездки';
           } else {
             msg += 'поездок';
