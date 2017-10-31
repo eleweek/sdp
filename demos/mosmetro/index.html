@@ -116,7 +116,7 @@
             msg += 'поездок';
           } else if (mod == 1) {
             msg += 'поездка';
-          } else if (mod in [2, 3, 4]) {
+          } else if ([2, 3, 4].includes(mod)) {
             msg += 'поездки';
           } else {
             msg += 'поездок';
@@ -166,8 +166,6 @@
             for (var [idx, ticketDescription] of ticketDescriptions.entries()) {
               var {avgTripCost, wastedTrips} = calcTripCost(ticketDescription, tripsCount);
               row = $("#results-ticket-id-" + idx);
-              console.log(row);
-              console.log(row.html());
               row.find('td.avgTripCost').html(avgTripCost.toFixed(2) + '₽');
               row.find('td.wastedTrips').html(ticketWarning(ticketDescription, wastedTrips));
             }
