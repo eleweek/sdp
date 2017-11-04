@@ -74,7 +74,7 @@
             price: 1700,
           }, {
             type: 'lim',
-            name: '1 поездка (по тройке)',
+            name: '1 поездка (по Тройке)',
             trips: 1,
             days: 365 * 5,
             price: 35,
@@ -157,10 +157,9 @@
                   var avgTripCost = $(itemElem).find('.avgTripCost').text();
                   return parseFloat(avgTripCost.replace('₽', ''));
               }
-            }
+            },
+            sortBy: 'avgTripCost'
           });
-
-          $table.isotope({sortBy: 'avgTripCost'});
 
           var refreshResultsTable = function(tripsCount) {
             for (var [idx, ticketDescription] of ticketDescriptions.entries()) {
@@ -311,10 +310,10 @@
 
       <div class="row">
         <div class="column column-10">
-          <input type="text" value="20" id="tripsCount">
+          <input type="text" value="10" id="tripsCount">
         </div>
         <div class="column column-90">
-          <input type="range" min="1" max="40" value="20" class="slider" id="tripsRange">
+          <input type="range" min="1" max="40" value="10" class="slider" id="tripsRange">
         </div>
       </div>
       <div class="row">
