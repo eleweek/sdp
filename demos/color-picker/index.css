@@ -1,0 +1,21 @@
+input[type='range'] {
+  padding: 0px;
+  border: 0px;
+}
+
+.app .color-sliders {
+  background-color: white;
+  margin-top: 1.5rem;
+}
+
+.app .color-sliders:first-of-type {
+  margin-top: 0rem;
+}
+
+.app {
+    margin-top: 1.5rem;
+}
+
+.form-group.color-slider {
+    margin-bottom: 0px;
+}

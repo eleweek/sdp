@@ -1,0 +1,33 @@
+{
+  "name": "simple-color-picker",
+  "version": "0.0.0",
+  "description": "Super simple color picker I made while learning react",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack --progress --colors --watch --optimize-minimize",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "bootstrap": "^4.0.0-beta.2",
+    "jquery": "^3.2.0",
+    "lodash": "^4.17.4",
+    "popper.js": "^1.12.9",
+    "react": "^0.14.5",
+    "react-dom": "^0.14.5",
+    "tinycolor2": "^1.4.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^6.4.1",
+    "babel-plugin-transform-es2015-modules-strip": "^0.1.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.7",
+    "jquery": "^1.9.1",
+    "style-loader": "^0.19.1",
+    "webpack": "^2.7.0"
+  }
+}
